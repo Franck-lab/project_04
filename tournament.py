@@ -1,4 +1,4 @@
-from views import UI
+from view.views import UI
 
 class Application(UI):
 	def __init__(self):

@@ -1,5 +1,5 @@
-from models import Tournament, Player, Round
-from mappers import DBGateway, Mapper
+from model.models import Tournament, Player, Round
+from .mappers import DBGateway, Mapper
 
 class Validator:
 	def prompt(self, message):

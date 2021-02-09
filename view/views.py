@@ -1,5 +1,5 @@
-from controllers import Controller
-from utils import Formater
+from controller.controllers import Controller
+from .utils import Formater
 
 class UI:
 	def __init__(self):
@@ -7,23 +7,24 @@ class UI:
 		self.view = View()
 		self.choice = 'M'
 
-	def go_back(self):
-		print('[M] Back to menu [Q] Quit')
-		self.choice = input()
-
 	def idle(self):
 		if self.choice == '1':
 			print(' New Tournament '.center(100, '='))
 			self.ctrl.create_tournament()
 			self.ctrl.save_tournament()
 			print('Creation Complete!!!!')
-			self.go_back()
+			print('[M] Back to menu [Q] Quit')
+			self.choice = input()
 		elif self.choice == '2':
 			self.view.show_tournaments(self.ctrl.load_tournaments())
-			self.go_back()
+			print('[M] Back to menu [Q] Quit')
+			self.choice = input()
 		elif self.choice == '3':
-			self.view.show_players(self.ctrl.load_players())
-			self.go_back()
+			print('Sorted: [1] Alphabetically, [2] By rank')
+			key = input()
+			self.view.show_players(self.ctrl.load_players(), key=key)
+			print('[M] Back to menu [Q] Quit')
+			self.choice = input()
 		elif self.choice.lower() == 'q':
 			self.done = True
 		else:
@@ -35,7 +36,7 @@ class View(Formater):
 		print(' Tournament Manager - Menu '.center(100, '='))
 		print('[1] Create New Tournament',
 					'[2] List Tournament',
-					'[3] List All Players'
+					'[3] List All Players',
 					'[Q] Quit', sep='\n'
 		)
 
@@ -48,7 +49,11 @@ class View(Formater):
 			table.append([next(ID), tournament.name, tournament.description, tournament.venue, tournament.date, tournament.time_control])
 		self.print_table(table, self.parse_table(table))
 
-	def show_players(self, players):
+	def show_players(self, players, key):
+		if key == '1': # by name
+			players.sort(key=str)
+		else:
+			players.sort(key=lambda x:x.rank)
 		table = [
 				['#', 'Name', 'Date of Birth', 'Gender', 'Rating', 'Score'],
 		]

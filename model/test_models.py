@@ -1,4 +1,4 @@
-from models import Tournament, Player, Round
+from .models import Tournament, Player, Round
 import pytest
 
 def test_tournament_model():
