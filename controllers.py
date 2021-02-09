@@ -1,5 +1,5 @@
 from models import Tournament, Player, Round
-from mappers import DBGateway
+from mappers import DBGateway, Mapper
 
 class Validator:
 	def prompt(self, message):
@@ -17,9 +17,9 @@ class Validator:
 			break
 		return a_number
 
-class Controller(Validator):
+class Controller(Validator, Mapper):
 	def __init__(self):
-		self.db_gateway = DBGateway('db.json')
+		Mapper.__init__(self)
 
 	def create_tournament(self):
 		t = {}
@@ -67,19 +67,6 @@ class Controller(Validator):
 
 	def save_tournament(self):
 		self.db_gateway.save(self.tournament.serialize())
-
-	def load_tournaments(self):
-		serialized = self.db_gateway.load()
-		tournaments = []
-		for t in serialized:
-			serialized_players = t.pop('players')
-			players = [Player(**p) for p in serialized_players]
-			serialized_rounds = t.pop('rounds')
-			rounds = [Round(**rd) for rd in serialized_rounds]
-			t = Tournament(**t, players=players)
-			t.rounds = rounds
-			tournaments.append(t)
-		return tournaments
 
 
 
