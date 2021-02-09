@@ -1,0 +1,80 @@
+from models import Tournament, Player, Round
+import pytest
+
+def test_tournament_model():
+	t = Tournament('name', 'venue', 'date', 'description', 'time_control',
+			 ['player_1', 'player_2', 'player_3', '...']
+	)
+	assert t.name
+	assert t.venue
+	assert t.date
+	assert t.description
+	assert t.time_control
+	assert type(t.players) == list
+	assert t.rounds == []
+
+def test_player_model():
+	player = Player('first_name', 'last_name', 'birthdate', 'gender', rank=20)
+	assert player.first_name
+	assert player.last_name
+	assert player.birthdate
+	assert player.gender
+	assert player.rank
+	assert player.score == 0
+	assert str(player) == 'First_Name Last_Name'
+
+
+def test_serialize_tournament_models():
+	t = Tournament('name', 'venue', 'date', 'description', 'time control',
+			 [Player('x', 'x', 'x','x', 6), Player('xx','xx', 'xx','xx',9)]
+	)
+
+	serialized = t.serialize()
+	expected = {
+		'name': 'name',
+		'venue': 'venue',
+		'date': 'date',
+		'description': 'description',
+		'time_control': 'time control',
+		'players': [
+				{
+					'first_name': 'x',
+					'last_name': 'x',
+					'birthdate': 'x',
+					'gender': 'x',
+					'rank': 6,
+					'score': 0
+				},
+				{
+					'first_name': 'xx',
+					'last_name': 'xx',
+					'birthdate': 'xx',
+					'gender': 'xx',
+					'rank': 9,
+					'score': 0
+				}
+		],
+		'rounds': []
+	}
+	assert serialized == expected
+	rd = Round('name', 'mm/dd/yyyy HH:MM', [(['player_1', 1], ['other', 0]), (['player_2', 0.5],['another', 0.6])])
+	t.rounds.append(rd)
+	expected['rounds'] = [
+				{
+					'name': 'name',
+					'start_timestamp': 'mm/dd/yyyy HH:MM',
+					'end_timestamp': '',
+					'matches': [(['player_1', 1], ['other', 0]), (['player_2', 0.5],['another', 0.6])]
+				}
+	]
+	assert expected == t.serialize()
+
+def test_round_model():
+	rd = Round('name', 'start_timestamp', ['match_1', 'match_2', 'match_3'])
+	assert rd.name
+	assert rd.start_timestamp
+	assert rd.end_timestamp == ''
+	assert type(rd.matches) == list
+
+
+

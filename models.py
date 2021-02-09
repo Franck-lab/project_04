@@ -1,0 +1,44 @@
+class Tournament:
+	def __init__(self, name, venue, date, description, time_control, players):
+		self.name = name
+		self.venue = venue
+		self.date = date
+		self.description = description
+		self.time_control = time_control
+		self.players = players
+		self.rounds = []
+
+	def serialize(self):
+		serialized = {
+				'name': self.name,
+				'venue': self.venue,
+				'date': self.date,
+				'description': self.description,
+				'time_control': self.time_control,
+		}
+		serialized['players'] = []
+		serialized['rounds'] = []
+		for player in self.players:
+			serialized['players'].append(player.__dict__)
+		for rd in self.rounds:
+			serialized['rounds'].append(rd.__dict__)
+		return serialized
+
+class Player:
+	def __init__(self, first_name, last_name, birthdate, gender, rank):
+		self.first_name = first_name
+		self.last_name = last_name
+		self.birthdate = birthdate
+		self.gender = gender
+		self.rank = rank
+		self.score = 0
+
+	def __str__(self):
+		return f'{self.first_name.title()} {self.last_name.title()}'
+
+class Round:
+	def __init__(self, name, start_timestamp, matches):
+		self.name = name
+		self.start_timestamp = start_timestamp
+		self.end_timestamp = ''
+		self.matches = matches
