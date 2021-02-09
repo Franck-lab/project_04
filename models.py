@@ -8,6 +8,14 @@ class Tournament:
 		self.players = players
 		self.rounds = []
 
+	def make_pairings(self):
+		players = [str(p) for p in sorted(self.players)]
+		lower, upper = players[:len(players)//2], players[len(players)//2:]
+		pairings = []
+		for player, other in zip(upper, lower):
+			pairings.append((player, other))
+		return pairings
+
 	def serialize(self):
 		serialized = {
 				'name': self.name,
@@ -33,8 +41,23 @@ class Player:
 		self.rank = rank
 		self.score = 0
 
+	def update_score(self, score):
+		self.score += score
+
 	def __str__(self):
 		return f'{self.first_name.title()} {self.last_name.title()}'
+
+	def __gt__(self, other):
+		if self.score == other.score:
+			return self.rank > other.rank
+		else:
+			return self.score > other.score
+
+	def __lt__(self, other):
+		if self.score == other.score:
+			return self.rank < other.rank
+		else:
+			return self.score < other.score
 
 class Round:
 	def __init__(self, name, start_timestamp, matches):

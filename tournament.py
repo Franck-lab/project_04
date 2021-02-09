@@ -1,4 +1,5 @@
 from models import Tournament, Player, Round
+from tinydb import TinyDB
 
 def create_tournament():
 	t = {}
@@ -16,6 +17,7 @@ def create_tournament():
 	nbr_players = prompt('How many players?')
 	players = []
 	while len(players) < nbr_players:
+		print(f' Player {len(players)} '.center(100, '-'))
 		players.append(add_player())
 	players = [Player(**p) for p in players]
 	tournament = Tournament(**t, players=players)
@@ -40,9 +42,14 @@ def add_player():
 	print('Enter date of birth')
 	player['birthdate'] = input()
 	print('Enter gender')
-	player['gender'] = input('Female, male: ')
+	player['gender'] = input('Female, Male: ')
 	player['rank'] = prompt('Enter player rank')
 	return player
+
+def save(serialized):
+	db = TinyDB('db.json')
+	t_table = db.table('tournaments')
+	t_table.insert(serialized)
 
 def prompt(message):
 	while True:
@@ -58,6 +65,7 @@ def prompt(message):
 			continue
 		break
 	return a_number
+
 def display_menu():
 	print(' Tournament Manager - Menu '.center(100, '='))
 	print('[1] Create New Tournament',

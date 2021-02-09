@@ -23,6 +23,32 @@ def test_player_model():
 	assert player.score == 0
 	assert str(player) == 'First_Name Last_Name'
 
+def test_compare_two_players():
+	player = Player('bob', 'smith', 'x', 'x', rank=45)
+	other = Player('alice', 'queen', 'x', 'x', rank=50)
+
+	assert player < other
+	assert other > player
+	player.update_score(1)
+	assert player.score == 1
+	assert player > other
+	assert other < player
+
+def test_make_pairings_for_first_round():
+	players = [
+			Player('bob', 'smith', 'x', 'x', rank=45),
+			Player('alice', 'queen', 'x', 'x', rank=50),
+			Player('paul', 'jones', 'x', 'x', rank=25),
+			Player('patt', 'sanders', 'x', 'x', rank=30),
+	]
+	t = Tournament('name', 'venue', 'date', 'description', 'time_control', players)
+	pairings = t.make_pairings()
+	expected = [
+				('Alice Queen', 'Patt Sanders'),
+				('Bob Smith', 'Paul Jones')
+	]
+	for pair in pairings:
+		assert pair in expected
 
 def test_serialize_tournament_models():
 	t = Tournament('name', 'venue', 'date', 'description', 'time control',
