@@ -40,10 +40,9 @@ class Controller(Validator):
 			print(f' Player {len(players)+1} '.center(100, '-'))
 			players.append(self.add_player())
 		players = [Player(**p) for p in players]
-		tournament = Tournament(**t, players=players)
-		rd = self.start_round('Round 1', tournament.make_pairings())
-		tournament.rounds.append(rd)
-		return tournament
+		self.tournament = Tournament(**t, players=players)
+		rd = self.start_round('Round 1', self.tournament.make_pairings())
+		self.tournament.rounds.append(rd)
 
 	def add_player(self):
 		player = {}
@@ -66,5 +65,23 @@ class Controller(Validator):
 			matches.append(([player, None], [other, None]))
 		return Round('Round 1', start_datetime, matches)
 
-	def save_tournament(self, tournament):
-		self.db_gateway.save(tournament.serialize())
+	def save_tournament(self):
+		self.db_gateway.save(self.tournament.serialize())
+
+	def load_tournaments(self):
+		serialized = self.db_gateway.load()
+		tournaments = []
+		for t in serialized:
+			serialized_players = t.pop('players')
+			players = [Player(**p) for p in serialized_players]
+			serialized_rounds = t.pop('rounds')
+			rounds = [Round(**rd) for rd in serialized_rounds]
+			t = Tournament(**t, players=players)
+			t.rounds = rounds
+			tournaments.append(t)
+		return tournaments
+
+
+
+
+

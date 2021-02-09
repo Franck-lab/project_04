@@ -33,13 +33,13 @@ class Tournament:
 		return serialized
 
 class Player:
-	def __init__(self, first_name, last_name, birthdate, gender, rank):
+	def __init__(self, first_name, last_name, birthdate, gender, rank, score=0):
 		self.first_name = first_name
 		self.last_name = last_name
 		self.birthdate = birthdate
 		self.gender = gender
 		self.rank = rank
-		self.score = 0
+		self.score = score
 
 	def update_score(self, score):
 		self.score += score
@@ -60,8 +60,8 @@ class Player:
 			return self.score < other.score
 
 class Round:
-	def __init__(self, name, start_timestamp, matches):
+	def __init__(self, name, start_timestamp, matches, end_timestamp=''):
 		self.name = name
 		self.start_timestamp = start_timestamp
-		self.end_timestamp = ''
+		self.end_timestamp = end_timestamp
 		self.matches = matches

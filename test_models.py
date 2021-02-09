@@ -96,7 +96,7 @@ def test_serialize_tournament_models():
 	assert expected == t.serialize()
 
 def test_round_model():
-	rd = Round('name', 'start_timestamp', ['match_1', 'match_2', 'match_3'])
+	rd = Round('name', 'start_timestamp', ['match_1', 'match_2', 'match_3'], '')
 	assert rd.name
 	assert rd.start_timestamp
 	assert rd.end_timestamp == ''
