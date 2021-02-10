@@ -25,6 +25,14 @@ class UI:
 			self.view.show_players(self.ctrl.load_players(), key=key)
 			print('[M] Back to menu [Q] Quit')
 			self.choice = input()
+		elif self.choice == '4':
+			print('Sorted: [1] Alphabetically, [2] By rank')
+			key = input()
+			t_name = self.ctrl.select_tournament()
+			self.view.show_players(self.ctrl.load_players(t_name), key=key)
+			print('[M] Back to menu [Q] Quit')
+			self.choice = input()
+
 		elif self.choice.lower() == 'q':
 			self.done = True
 		else:
@@ -37,6 +45,7 @@ class View(Formater):
 		print('[1] Create New Tournament',
 					'[2] List Tournament',
 					'[3] List All Players',
+					'[4] List Players in a Tournament',
 					'[Q] Quit', sep='\n'
 		)
 

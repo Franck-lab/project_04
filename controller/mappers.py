@@ -31,12 +31,16 @@ class Mapper:
 		return tournaments
 
 	def load_players(self, tournament_name=None):
+		serialized = self.db_gateway.load()
 		if tournament_name:
-			pass
+			for t in serialized:
+				if t['name'] == tournament_name:
+					players = [Player(**p) for p in t['players']]
+					break
+		elif tournament_name == '':
+			return []
 		else:
-			serialized = self.db_gateway.load()
 			players = []
 			for t in serialized:
-				serialized_players = t.pop('players')
-				players.extend([Player(**p) for p in serialized_players])
+				players.extend([Player(**p) for p in t['players']])
 		return players

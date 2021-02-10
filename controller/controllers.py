@@ -44,6 +44,15 @@ class Controller(Validator, Mapper):
 		rd = self.start_round('Round 1', self.tournament.make_pairings())
 		self.tournament.rounds.append(rd)
 
+	def select_tournament(self):
+		tournaments = self.load_tournaments()
+		print('Select a Tournament')
+		for t in tournaments:
+			selected = input(f'Tournament: {t.name.title()} [Enter] continue, [Y] List: ')
+			if selected.lower() == 'y':
+				return t.name
+		return ''
+
 	def add_player(self):
 		player = {}
 		print('Enter first name')
