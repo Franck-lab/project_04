@@ -32,7 +32,11 @@ class UI:
 			self.view.show_players(self.ctrl.load_players(t_name), key=key)
 			print('[M] Back to menu [Q] Quit')
 			self.choice = input()
-
+		elif self.choice == '5':
+			t_name = self.ctrl.select_tournament()
+			self.view.show_rounds(self.ctrl.load_rounds(t_name))
+			print('[M] Back to menu [Q] Quit')
+			self.choice = input()
 		elif self.choice.lower() == 'q':
 			self.done = True
 		else:
@@ -46,6 +50,7 @@ class View(Formater):
 					'[2] List Tournament',
 					'[3] List All Players',
 					'[4] List Players in a Tournament',
+					'[5] List Rounds in a Tournament',
 					'[Q] Quit', sep='\n'
 		)
 
@@ -70,3 +75,16 @@ class View(Formater):
 		for player in players:
 			table.append([next(ID), str(player), player.birthdate, player.gender, str(player.rank), str(player.score)])
 		self.print_table(table, self.parse_table(table))
+
+	def show_rounds(self, rounds):
+		table = [
+				['#', 'Name', 'Start Datetime', 'End Datetime'],
+		]
+		ID = (str(n + 1) for n in range(10000))
+		for rd in rounds:
+			table.append([next(ID), rd.name, rd.start_timestamp, rd.end_timestamp])
+		self.print_table(table, self.parse_table(table))
+
+
+
+

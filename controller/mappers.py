@@ -15,10 +15,10 @@ class DBGateway:
 
 class Mapper:
 	def __init__(self):
-		self.db_gateway = DBGateway('db.json')
+		self.gateway = DBGateway('db.json')
 
 	def load_tournaments(self):
-		serialized = self.db_gateway.load()
+		serialized = self.gateway.load()
 		tournaments = []
 		for t in serialized:
 			serialized_players = t.pop('players')
@@ -31,7 +31,7 @@ class Mapper:
 		return tournaments
 
 	def load_players(self, tournament_name=None):
-		serialized = self.db_gateway.load()
+		serialized = self.gateway.load()
 		if tournament_name:
 			for t in serialized:
 				if t['name'] == tournament_name:
@@ -44,3 +44,16 @@ class Mapper:
 			for t in serialized:
 				players.extend([Player(**p) for p in t['players']])
 		return players
+
+	def load_rounds(self, tournament_name):
+		serialized = self.gateway.load()
+		rounds = []
+		if tournament_name:
+			for t in serialized:
+				if t['name'] == tournament_name:
+					rounds = [Round(**rd) for rd in t['rounds']]
+					break
+
+		return rounds
+
+
