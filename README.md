@@ -1,8 +1,8 @@
 # project_04: Develop a software Program Using Python
 A tournament manager program console based
 ### Create a virtual environemt and install required packages
-`$ python3 -m venv <venv_name>`
-`$ source <venv_name>/bin/activate`
+`$ python3 -m venv <venv_name>`.     
+`$ source <venv_name>/bin/activate`.    
 `(venv_name)$ pip install -r requirements.txt`
 ### Start program
 `(venv_name)$ python tournament.py`
