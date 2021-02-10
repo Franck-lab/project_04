@@ -17,6 +17,9 @@ class Validator:
 			if 'result' in message and a_number not in (1, 2, 3):
 				print('Enter a valid score. [1-3]')
 				continue
+			if 'rank' in message and a_number < 0:
+				print('Please a positive number.')
+				continue
 			break
 		return a_number
 
@@ -113,6 +116,15 @@ class Controller(Validator, Mapper):
 			if rd:
 				self.selected.rounds.append(rd)
 			self.save_tournaments()
+
+	def update_ratings(self):
+		for player in self.selected.players:
+			entry = input(f'Player: {str(player)} [ENTER] Continue or [Y] Edit rank: ')
+			if entry.lower() == 'y':
+				rank = self.prompt('Enter rank')
+				player.rank = rank
+				break
+		self.save_tournaments()
 
 	def save_tournaments(self):
 		serialized = [t.serialize() for t in self.tournaments]

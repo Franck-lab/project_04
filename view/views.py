@@ -52,6 +52,13 @@ class UI:
 				print('Updates Complete!!!!')
 			print('[M] Back to menu [Q] Quit')
 			self.choice = input()
+		elif self.choice == '8':
+			self.ctrl.select_tournament()
+			if self.ctrl.selected:
+				self.ctrl.update_ratings()
+				print('Updates Complete!!!!')
+			print('[M] Back to menu [Q] Quit')
+			self.choice = input()
 		elif self.choice.lower() == 'q':
 			self.done = True
 		else:
@@ -68,6 +75,7 @@ class View(Formater):
 					'[5] List Rounds in a Tournament',
 					'[6] List Matches in a Tournament',
 					'[7] Upload Results',
+					'[8] Update Player Rating',
 					'[Q] Quit', sep='\n'
 		)
 
