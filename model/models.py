@@ -1,5 +1,5 @@
 class Tournament:
-	def __init__(self, name, venue, date, description, time_control, players):
+	def __init__(self, name, venue, date, description, time_control, players, ended=False):
 		self.name = name
 		self.venue = venue
 		self.date = date
@@ -7,13 +7,27 @@ class Tournament:
 		self.time_control = time_control
 		self.players = players
 		self.rounds = []
+		self.ended = ended
 
 	def make_pairings(self):
-		players = [str(p) for p in sorted(self.players)]
-		lower, upper = players[:len(players)//2], players[len(players)//2:]
 		pairings = []
-		for player, other in zip(upper, lower):
-			pairings.append((player, other))
+		if len(self.rounds) >= 1:
+			players = [str(p) for p in sorted(self.players)]
+			last_pairings = [(match[0][0], match[1][0]) for rd in self.rounds for match in rd.matches]
+			while players:
+				player = players.pop()
+				for other in players[-1::-1]:
+					if ((player, other) not in last_pairings) and ((other, player) not in last_pairings):
+						pairings.append((player, other))
+						players.remove(other)
+						break
+		else:
+			players = [str(p) for p in sorted(self.players, key=lambda x:x.rank)]
+			lower, upper = players[:len(players)//2], players[len(players)//2:]
+			for player, other in zip(upper, lower):
+				pairings.append((player, other))
+		if not pairings:
+			self.ended = True
 		return pairings
 
 	def serialize(self):
@@ -23,6 +37,7 @@ class Tournament:
 				'date': self.date,
 				'description': self.description,
 				'time_control': self.time_control,
+				'ended': self.ended
 		}
 		serialized['players'] = []
 		serialized['rounds'] = []

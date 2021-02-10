@@ -7,7 +7,8 @@ class DBGateway:
 
 	def save(self, serialized):
 		t_table = self.db.table('tournaments')
-		t_table.insert(serialized)
+		t_table.truncate()
+		t_table.insert_multiple(serialized)
 
 	def load(self):
 		t_table = self.db.table('tournaments')
@@ -30,30 +31,10 @@ class Mapper:
 			tournaments.append(t)
 		return tournaments
 
-	def load_players(self, tournament_name=None):
-		serialized = self.gateway.load()
-		if tournament_name:
-			for t in serialized:
-				if t['name'] == tournament_name:
-					players = [Player(**p) for p in t['players']]
-					break
-		elif tournament_name == '':
-			return []
-		else:
-			players = []
-			for t in serialized:
-				players.extend([Player(**p) for p in t['players']])
-		return players
-
-	def load_rounds(self, tournament_name):
-		serialized = self.gateway.load()
-		rounds = []
-		if tournament_name:
-			for t in serialized:
-				if t['name'] == tournament_name:
-					rounds = [Round(**rd) for rd in t['rounds']]
-					break
-
-		return rounds
+	def get_players(self):
+		tournaments = self.load_tournaments()
+		players = []
+		for t in tournaments:
+			players.extend(t.players)
 
 

@@ -11,35 +11,45 @@ class UI:
 		if self.choice == '1':
 			print(' New Tournament '.center(100, '='))
 			self.ctrl.create_tournament()
-			self.ctrl.save_tournament()
 			print('Creation Complete!!!!')
 			print('[M] Back to menu [Q] Quit')
 			self.choice = input()
 		elif self.choice == '2':
-			self.view.show_tournaments(self.ctrl.load_tournaments())
+			self.view.show_tournaments(self.ctrl.tournaments)
 			print('[M] Back to menu [Q] Quit')
 			self.choice = input()
 		elif self.choice == '3':
 			print('Sorted: [1] Alphabetically, [2] By rank')
 			key = input()
-			self.view.show_players(self.ctrl.load_players(), key=key)
+			players = [p for t in self.ctrl.tournaments for p in t.players]
+			self.view.show_players(players, key=key)
 			print('[M] Back to menu [Q] Quit')
 			self.choice = input()
 		elif self.choice == '4':
 			print('Sorted: [1] Alphabetically, [2] By rank')
 			key = input()
-			t_name = self.ctrl.select_tournament()
-			self.view.show_players(self.ctrl.load_players(t_name), key=key)
+			self.ctrl.select_tournament()
+			if self.ctrl.selected:
+				self.view.show_players(self.ctrl.selected.players, key=key)
 			print('[M] Back to menu [Q] Quit')
 			self.choice = input()
 		elif self.choice == '5':
-			t_name = self.ctrl.select_tournament()
-			self.view.show_rounds(self.ctrl.load_rounds(t_name))
+			self.ctrl.select_tournament()
+			if self.ctrl.selected:
+				self.view.show_rounds(self.ctrl.selected.rounds)
 			print('[M] Back to menu [Q] Quit')
 			self.choice = input()
 		elif self.choice == '6':
-			t_name = self.ctrl.select_tournament()
-			self.view.show_matches(self.ctrl.load_rounds(t_name))
+			self.ctrl.select_tournament()
+			if self.ctrl.selected:
+				self.view.show_matches(self.ctrl.selected.rounds)
+			print('[M] Back to menu [Q] Quit')
+			self.choice = input()
+		elif self.choice == '7':
+			self.ctrl.select_tournament()
+			if self.ctrl.selected:
+				self.ctrl.upload_results()
+				print('Updates Complete!!!!')
 			print('[M] Back to menu [Q] Quit')
 			self.choice = input()
 		elif self.choice.lower() == 'q':
@@ -57,6 +67,7 @@ class View(Formater):
 					'[4] List Players in a Tournament',
 					'[5] List Rounds in a Tournament',
 					'[6] List Matches in a Tournament',
+					'[7] Upload Results',
 					'[Q] Quit', sep='\n'
 		)
 
@@ -65,8 +76,8 @@ class View(Formater):
 				['#', 'Name', 'Description', 'Venue', 'Date', 'Time Control'],
 		]
 		ID = (str(n + 1) for n in range(10000))
-		for tournament in tournaments:
-			table.append([next(ID), tournament.name, tournament.description, tournament.venue, tournament.date, tournament.time_control])
+		for t in tournaments:
+			table.append([next(ID), t.name, t.description, t.venue, t.date, t.time_control])
 		self.print_table(table, self.parse_table(table))
 
 	def show_players(self, players, key):

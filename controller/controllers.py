@@ -14,12 +14,18 @@ class Validator:
 			if a_number < 2 and 'players' in message:
 				print('Enter at least 2 players.')
 				continue
+			if 'result' in message and a_number not in (1, 2, 3):
+				print('Enter a valid score. [1-3]')
+				continue
 			break
 		return a_number
 
 class Controller(Validator, Mapper):
 	def __init__(self):
 		Mapper.__init__(self)
+		self.tournaments = []
+		self.tournaments.extend(self.load_tournaments())
+		self.selected = None
 
 	def create_tournament(self):
 		t = {}
@@ -40,18 +46,22 @@ class Controller(Validator, Mapper):
 			print(f' Player {len(players)+1} '.center(100, '-'))
 			players.append(self.add_player())
 		players = [Player(**p) for p in players]
-		self.tournament = Tournament(**t, players=players)
-		rd = self.start_round('Round 1', self.tournament.make_pairings())
-		self.tournament.rounds.append(rd)
+		tournament = Tournament(**t, players=players)
+		rd = self.start_round('Round 1', tournament.make_pairings())
+		tournament.rounds.append(rd)
+		self.tournaments.append(tournament)
+		self.save_tournaments()
 
 	def select_tournament(self):
-		tournaments = self.load_tournaments()
-		print('Select a Tournament')
-		for t in tournaments:
+		print(' Select a Tournament '.center(100, '-'))
+		for t in self.tournaments:
 			selected = input(f'Tournament: {t.name.title()} [Enter] continue, [Y] List: ')
 			if selected.lower() == 'y':
-				return t.name
-		return ''
+				self.selected = t
+				break
+		else:
+			self.selected = None
+
 
 	def add_player(self):
 		player = {}
@@ -67,15 +77,46 @@ class Controller(Validator, Mapper):
 		return player
 
 	def start_round(self, name, pairings):
-		print('Enter start date and time [Round 1]')
-		start_datetime = input('mm/ddd/yyyy HH:MM: ')
-		matches = []
-		for player, other in pairings:
-			matches.append(([player, None], [other, None]))
-		return Round('Round 1', start_datetime, matches)
+		if pairings:
+			print(f'Enter start date and time {name}')
+			start_datetime = input('mm/dd/yyyy HH:MM: ')
+			matches = []
+			for player, other in pairings:
+				matches.append(([player, None], [other, None]))
+			return Round(name, start_datetime, matches)
+		else:
+			return None
 
-	def save_tournament(self):
-		self.db_gateway.save(self.tournament.serialize())
+	def upload_results(self):
+		if not self.selected.ended:
+			players = [str(p) for p in self.selected.players]
+			rd = self.selected.rounds[-1]
+			print('Enter end date and time for this round')
+			rd.end_timestamp = input('mm/dd/yyyy HH:MM: ')
+			for i, match in enumerate(rd.matches):
+				print(f'Match {i+1}: {match[0][0]} [X] - {match[1][0]}')
+				score = self.prompt('Enter result X, (win [1], lose [2], tie [3]: ')
+				if score == 1:
+					match[0][1] = 1
+					self.selected.players[players.index(match[0][0])].update_score(1)
+					match[1][1] = 0
+				elif score == 2:
+					match[0][1] = 0
+					match[1][1] = 1
+					self.selected.players[players.index(match[1][0])].update_score(1)
+				else:
+					match[0][1] = .5
+					self.selected.players[players.index(match[0][0])].update_score(.5)
+					match[1][1] = .5
+					self.selected.players[players.index(match[1][0])].update_score(.5)
+			rd = self.start_round(f'Round {len(self.selected.rounds)+1}', self.selected.make_pairings())
+			if rd:
+				self.selected.rounds.append(rd)
+			self.save_tournaments()
+
+	def save_tournaments(self):
+		serialized = [t.serialize() for t in self.tournaments]
+		self.gateway.save(serialized)
 
 
 

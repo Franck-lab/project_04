@@ -1,6 +1,13 @@
 from .models import Tournament, Player, Round
 import pytest
 
+players = [
+			Player('bob', 'smith', 'x', 'x', rank=45),
+			Player('alice', 'queen', 'x', 'x', rank=50),
+			Player('paul', 'jones', 'x', 'x', rank=25),
+			Player('patt', 'sanders', 'x', 'x', rank=30),
+	]
+
 def test_tournament_model():
 	t = Tournament('name', 'venue', 'date', 'description', 'time_control',
 			 ['player_1', 'player_2', 'player_3', '...']
@@ -12,6 +19,7 @@ def test_tournament_model():
 	assert t.time_control
 	assert type(t.players) == list
 	assert t.rounds == []
+	assert not t.ended
 
 def test_player_model():
 	player = Player('first_name', 'last_name', 'birthdate', 'gender', rank=20)
@@ -35,12 +43,6 @@ def test_compare_two_players():
 	assert other < player
 
 def test_make_pairings_for_first_round():
-	players = [
-			Player('bob', 'smith', 'x', 'x', rank=45),
-			Player('alice', 'queen', 'x', 'x', rank=50),
-			Player('paul', 'jones', 'x', 'x', rank=25),
-			Player('patt', 'sanders', 'x', 'x', rank=30),
-	]
 	t = Tournament('name', 'venue', 'date', 'description', 'time_control', players)
 	pairings = t.make_pairings()
 	expected = [
@@ -48,7 +50,33 @@ def test_make_pairings_for_first_round():
 				('Bob Smith', 'Paul Jones')
 	]
 	for pair in pairings:
-		assert pair in expected
+		assert pair in expected or pair[-1::-1] in expected
+
+def test_make_pairings_for_subsequence_rounds():
+	t = Tournament('name', 'venue', 'date', 'description', 'time_control', players)
+	rd = Round('name', 'mm/dd/yyyy HH:MM', [(['Alice Queen', 1], ['Patt Sanders', 0]), (['Bob Smith', 0.5],['Paul Jones', 0.5])])
+	t.rounds.append(rd)
+	pairings = t.make_pairings()
+	expected = [
+				('Alice Queen', 'Bob Smith'),
+				('Paul Jones', 'Patt Sanders')
+	]
+	for pair in pairings:
+		assert pair in expected or pair[-1::-1] in expected
+	rd = Round('name', 'mm/dd/yyyy HH:MM', [(['Alice Queen', 1], ['Bob Smith', 0]), (['Patt Sanders', 0.5],['Paul Jones', 0.5])])
+	t.rounds.append(rd)
+	pairings = t.make_pairings()
+	expected = [
+				('Alice Queen', 'Paul Jones'),
+				('Bob Smith', 'Patt Sanders')
+	]
+	for pair in pairings:
+		assert pair in expected or pair[-1::-1] in expected
+	rd = Round('name', 'mm/dd/yyyy HH:MM', [(['Alice Queen', 1], ['Paul Jones', 0]), (['Patt Sanders', 1],['Bob Smith', 0])])
+	t.rounds.append(rd)
+	assert t.make_pairings() == []
+	assert t.ended
+
 
 def test_serialize_tournament_models():
 	t = Tournament('name', 'venue', 'date', 'description', 'time control',
@@ -62,6 +90,7 @@ def test_serialize_tournament_models():
 		'date': 'date',
 		'description': 'description',
 		'time_control': 'time control',
+		'ended': False,
 		'players': [
 				{
 					'first_name': 'x',
@@ -83,14 +112,14 @@ def test_serialize_tournament_models():
 		'rounds': []
 	}
 	assert serialized == expected
-	rd = Round('name', 'mm/dd/yyyy HH:MM', [(['player_1', 1], ['other', 0]), (['player_2', 0.5],['another', 0.6])])
+	rd = Round('name', 'mm/dd/yyyy HH:MM', [(['player_1', 1], ['other', 0]), (['player_2', 0.5],['another', 0.5])])
 	t.rounds.append(rd)
 	expected['rounds'] = [
 				{
 					'name': 'name',
 					'start_timestamp': 'mm/dd/yyyy HH:MM',
 					'end_timestamp': '',
-					'matches': [(['player_1', 1], ['other', 0]), (['player_2', 0.5],['another', 0.6])]
+					'matches': [(['player_1', 1], ['other', 0]), (['player_2', 0.5],['another', 0.5])]
 				}
 	]
 	assert expected == t.serialize()
