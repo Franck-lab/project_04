@@ -37,6 +37,11 @@ class UI:
 			self.view.show_rounds(self.ctrl.load_rounds(t_name))
 			print('[M] Back to menu [Q] Quit')
 			self.choice = input()
+		elif self.choice == '6':
+			t_name = self.ctrl.select_tournament()
+			self.view.show_matches(self.ctrl.load_rounds(t_name))
+			print('[M] Back to menu [Q] Quit')
+			self.choice = input()
 		elif self.choice.lower() == 'q':
 			self.done = True
 		else:
@@ -51,6 +56,7 @@ class View(Formater):
 					'[3] List All Players',
 					'[4] List Players in a Tournament',
 					'[5] List Rounds in a Tournament',
+					'[6] List Matches in a Tournament',
 					'[Q] Quit', sep='\n'
 		)
 
@@ -83,6 +89,18 @@ class View(Formater):
 		ID = (str(n + 1) for n in range(10000))
 		for rd in rounds:
 			table.append([next(ID), rd.name, rd.start_timestamp, rd.end_timestamp])
+		self.print_table(table, self.parse_table(table))
+
+	def show_matches(self, rounds):
+		table = [
+				['#', 'Round', 'Matches'],
+		]
+		ID = (str(n + 1) for n in range(10000))
+		for rd in rounds:
+			for match in rd.matches:
+				opponent_1 = f'{match[0][0]} [{match[0][1]}]'.rjust(25)
+				opponent_2 = f'[{match[1][1]}] {match[1][0]}'.ljust(25)
+				table.append([next(ID), rd.name, opponent_1 + ' - ' + opponent_2])
 		self.print_table(table, self.parse_table(table))
 
 
