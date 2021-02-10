@@ -28,7 +28,7 @@ Provide the tournament information when prompted along with the players you want
 ### Uploading the results [7]
 Select the specific tournament:      
 e.g: Match: player [X] - other X = ([1] win, [2] lose, [3] tie).     
-'player' gets whatever your score your entered.    
+'player' gets whatever score your entered.    
 
 ### Generate flake8-html file
 `flake8 --format=html --htmldir=flake-report --ignore E111 controller/ model/ view/ tournament.py`
